@@ -1,0 +1,39 @@
+# Stage 1: Build
+
+# Use the official Node.js image
+FROM node:20.16.0 AS builder
+
+# Create and change to the app directory
+WORKDIR /usr/src/app
+
+# Copy application dependency manifests to the container image
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the application code to the container
+COPY . .
+
+# Compile TypeScript to JavaScript
+RUN npm run build
+
+# Stage 2: Production
+
+# Use the official Node.js image
+FROM node:20.16.0
+
+# Create and change to the app directory
+WORKDIR /usr/src/app
+
+# Copy only the compiled files from the build stage
+COPY --from=builder /usr/src/app/dist ./dist
+COPY --from=builder /usr/src/app/package.json ./package.json
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/.env.development ./.env.dev
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Run the web service on container startup
+CMD [ "npm", "run", "start-dev" ]
