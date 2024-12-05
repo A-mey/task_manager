@@ -51,6 +51,7 @@ export class TaskUtil {
     getTaskByIdUtil = async (id: string, status: string) => {
         try {
             const task = await this.taskDao.getParticularTaskById(id);
+            console.log("getTaskByIdUtil:task", task);
             if (!task) {
                 throw new Error("404, Task not found")
             }

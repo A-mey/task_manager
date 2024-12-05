@@ -44,7 +44,9 @@ export class FileDatabase {
             const content = await fs.readFile(`${this.filePath}/${model}`, 'utf8');
             if (content && isJsonString(content)) {
                 let contentJson = JSON.parse(content);
-                return contentJson.find((x: any) => x[field] === value);
+                console.log("contentJson", contentJson);
+                let filteredContent = contentJson.find((x: any) => x[field] === value);
+                return filteredContent;
             } else {
                 throw new Error("Something went wrong");
             }
@@ -55,7 +57,7 @@ export class FileDatabase {
 
     addNewData = async (model: string, data: any) => {
         try {
-            await fs.writeFile(`this.filePath/${model}`, JSON.stringify(data, null, 2));
+            await fs.writeFile(`${this.filePath}/${model}`, JSON.stringify(data, null, 2));
         } catch (error) {
             throw new Error(catchError(error));
         }
@@ -63,11 +65,11 @@ export class FileDatabase {
 
     removeData = async (model: string, field: string, value: string) => {
         try {
-            const content = await fs.readFile(`this.filePath/${model}`, 'utf8');
+            const content = await fs.readFile(`${this.filePath}/${model}`, 'utf8');
             if (content && isJsonString(content)) {
                 let contentJson = JSON.parse(content);
                 contentJson = contentJson.filter((x: any) => x[field] !== value);
-                await this.addNewData(`this.filePath/${model}`, contentJson);
+                await this.addNewData(`${model}`, contentJson);
             } else {
                 throw new Error("Something went wrong");
             }
@@ -76,19 +78,21 @@ export class FileDatabase {
         }
     }
 
-    updateData = async (model: string, field: string, value: string, newValue: string) => {
+    updateData = async (model: string, field: string, value: string, fieldToChange: string, newValue: any) => {
         try {
-            const content = await fs.readFile(`this.filePath/${model}`, 'utf8');
+            const content = await fs.readFile(`${this.filePath}/${model}`, 'utf8');
             if (content && isJsonString(content)) {
                 const newContentJson: any = [];
                 let contentJson = JSON.parse(content);
                 contentJson.forEach((x: any) => {
-                    if (x[field] !== value) {
-                        x[field] = newValue
+                    if (x[field] === value) {
+                        x[fieldToChange] = newValue
                     }
+                    console.log("x", x);
                     newContentJson.push({...x});
                 });
-                await this.addNewData(`this.filePath/${model}`, newContentJson);
+                console.log("newContentJson", newContentJson);
+                await this.addNewData(`${model}`, newContentJson);
             } else {
                 throw new Error("Something went wrong");
             }
@@ -102,7 +106,8 @@ export class FileDatabase {
             const content = await fs.readFile(`${this.filePath}/${model}`, 'utf8');
             if (content && isJsonString(content)) {
                 let contentJson = JSON.parse(content);
-                return contentJson.filter((x: any) => x[field] === value);
+                const data = contentJson.filter((x: any) => x[field] === value);
+                return data;
             } else {
                 throw new Error("Something went wrong");
             }

@@ -10,7 +10,7 @@ export class TaskDao implements ITaskDaoInterface {
         this.model = "task.json";
     }
 
-    addTaskDao = async (data: any) => {
+    addTaskDao = async (data: any): Promise<void> => {
         try {
             await this.fileDataBase.addData(this.model, data);
         } catch (error) {
@@ -38,7 +38,7 @@ export class TaskDao implements ITaskDaoInterface {
 
     updateDataById = async (id: string, status: string) => {
         try {
-            await this.fileDataBase.updateData(this.model, "id", id, status);
+            await this.fileDataBase.updateData(this.model, "id", id, "status", status);
         } catch (error) {
             throw new Error(catchError(error));
         }
